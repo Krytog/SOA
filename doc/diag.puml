@@ -46,7 +46,7 @@ Table(stats, "Statistics") {
 }
 
 ' Relations
-user |o--o{ task : "creates"
+user |o--o{ post : "creates"
 post ||--o{ comment : "has"
 user |o--o{ comment : "creates"
 event ||--o{ stats : "has"
