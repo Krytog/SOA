@@ -48,7 +48,10 @@ Table(stats, "Statistics") {
 ' Relations
 user |o--o{ post : "creates"
 post ||--o{ comment : "has"
+post ||--o{ stats : "has"
+comment ||--o{ stats : "has"
 user |o--o{ comment : "creates"
-event ||--o{ stats : "has"
+user |o--o{ event : "publishes"
+event |o--o{ stats : "updates"
 
 @enduml
