@@ -1,0 +1,40 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/latest/C4_Container.puml
+
+LAYOUT_WITH_LEGEND()
+LAYOUT_TOP_DOWN()
+
+title
+   <b>Social network container diagram v2024.02.22</b>
+end title
+
+Person(user, "User", "Uses front-ends which communicate with the social network via REST API.")
+
+System_Boundary(main_service, "Main service") {
+    Container(main_service_api, "API service", "C++20, Python3.10", "Handles API requests from the users. Communicates with the other social network systems")
+    ContainerDb(main_service_db, "Users Database", "Database", "Information about registered users and authentication credentials")
+}
+
+System_Boundary(content_service, "Content service") {
+    Container(content_service_gate, "internal content service", "C++20, Python3.10", "Handles requests from main API service. Reads, creates and updates the social network content, communicating with Content Database")
+    ContainerDb(content_service_db, "Content Database", "Database", "Posts and comments of the social network")
+}
+
+System_Boundary(statistics_service, "Statistics service") {
+    Container(statistics_service_mb, "Statistics Message Broker", "RabbitMQ", "Views/likes events")
+    Container(statistics_service_gate, "internal statistics service", "C++20, Python3.10", "Handles requests from main API service and handles events in Statistics Message Broker. Provides views/likes statistics.")
+    ContainerDb(statistics_service_db, "Statistics Database", "Database", "Views/likes data")
+}
+
+Rel(user, main_service_api, "Uses", "REST API")
+Rel(main_service_api, main_service_db, "Reads/Writes")
+Rel(main_service_api, content_service_gate, "Request", "gRPC")
+Rel(main_service_api, statistics_service_gate, "Request", "gRPC")
+
+Rel(content_service_gate, content_service_db, "Reads/Writes")
+Rel(statistics_service_gate, statistics_service_mb, "Reads")
+Rel(main_service_api, statistics_service_mb, "Publishes")
+Rel(statistics_service_gate, statistics_service_db, "Reads/Writes")
+
+
+@enduml
