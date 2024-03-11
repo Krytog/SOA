@@ -1,0 +1,22 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/latest/C4_Context.puml
+
+LAYOUT_WITH_LEGEND()
+LAYOUT_TOP_DOWN()
+
+title
+   <b>Social network context diagram v2024.02.22</b>
+end title
+
+Person(user, "User", "A user of the social network")
+
+System_Boundary(social_network, "The social network") {
+    System(main_service, "Main service", "Provides client API, responsible for registration and authentication")
+    System(content_service, "Content service", "Responsible for users' posts and comments")
+    System(statistics_service, "Statistics service", "Responsible for gathering and accumulating statistics")
+}
+
+Rel(user, main_service, "Uses")
+Rel(main_service, content_service, "Gets content using")
+Rel(main_service, statistics_service, "Handles statistics using")
+@enduml

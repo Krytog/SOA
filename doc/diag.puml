@@ -1,0 +1,57 @@
+plantuml
+@startuml
+!define Table(name,desc) entity name as "desc" << (T, white) >>
+!define primary_key(x) <u>x</u>
+!define foreign_key(x) <color:red><</color> x
+
+Table(user, "User") {
+    primary_key(id) : integer
+    username : varchar
+    bio: text
+    email : varchar
+    password_hash : varchar
+    registered_date : datetime
+    last_online_date : datetime
+}
+
+Table(post, "Post") {
+    primary_key(id) : integer
+    foreign_key(author_id) : integer
+    content : text
+    create_date : datetime
+    update_date : datetime
+}
+
+Table(comment, "Comment") {
+    primary_key(id) : integer
+    foreign_key(post_id) : integer
+    foreign_key(answer_id) : integer
+    foreign_key(user_id) : integer
+    content : text
+    create_date : datetime
+    update_date : datetime
+}
+
+Table(event, "Event") {
+    primary_key(id) : integer
+    event_type : varchar
+    user_id: integer
+    date : datetime
+}
+
+Table(stats, "Statistics") {
+    primary_key(content_id) : integer
+    views : integer
+    likes : integer
+}
+
+' Relations
+user |o--o{ post : "creates"
+post ||--o{ comment : "has"
+post ||--o{ stats : "has"
+comment ||--o{ stats : "has"
+user |o--o{ comment : "creates"
+user |o--o{ event : "publishes"
+event |o--o{ stats : "updates"
+
+@enduml
