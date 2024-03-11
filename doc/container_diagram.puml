@@ -21,7 +21,7 @@ System_Boundary(content_service, "Content service") {
 }
 
 System_Boundary(statistics_service, "Statistics service") {
-    Container(statistics_service_mb, "Statistics Message Broker", "RabbitMQ", "Views/likes events")
+    ContainerQueue(statistics_service_mb, "Statistics Message Broker", "RabbitMQ", "Views/likes event queue")
     Container(statistics_service_gate, "internal statistics service", "C++20, Python3.10", "Handles requests from main API service and handles events in Statistics Message Broker. Provides views/likes statistics.")
     ContainerDb(statistics_service_db, "Statistics Database", "Database", "Views/likes data")
 }
@@ -35,6 +35,4 @@ Rel(content_service_gate, content_service_db, "Reads/Writes")
 Rel(statistics_service_gate, statistics_service_mb, "Reads")
 Rel(main_service_api, statistics_service_mb, "Publishes")
 Rel(statistics_service_gate, statistics_service_db, "Reads/Writes")
-
-
 @enduml
