@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import main_api
+from main.routers.main import main_api
 from database import main_database
 from os import environ
 from contextlib import asynccontextmanager
