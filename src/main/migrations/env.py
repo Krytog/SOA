@@ -5,7 +5,7 @@ from sqlalchemy import pool
 
 from os import environ
 from alembic import context
-from main.database.models import users_table, tokens_table
+from database.models import metadata
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -25,7 +25,7 @@ config.set_section_option(section, "DB_NAME", environ.get("DB_NAME"))
 
 fileConfig(config.config_file_name)
 
-target_metadata = [users_table.metadata, tokens_table.metadata]
+target_metadata = [metadata]
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

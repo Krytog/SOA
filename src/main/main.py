@@ -1,25 +1,20 @@
 from fastapi import FastAPI
-from main.routers.main import main_api
-from database import main_database
-from os import environ
+from routers.main.main_api import router as main_api
+from os import environ, system
 from contextlib import asynccontextmanager
 import uvicorn
 
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    await main_database.connect()
-    yield
-    await main_database.disconnect()
-
-
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 app.include_router(main_api)
 
 
-HOST = environ.get("HOST")
-PORT = environ.get("PORT")
+HOST = environ.get("APP_HOST")
+PORT = int(environ.get("APP_PORT"))
 
+def init_db():
+    system("alembic revision --autogenerate -m \"Init tables\"")
+    system("alembic upgrade head")
 
 if __name__ == "__main__":
+    init_db()
     uvicorn.run(app, host=HOST, port=PORT)
