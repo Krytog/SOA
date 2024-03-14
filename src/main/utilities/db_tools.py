@@ -34,21 +34,24 @@ async def create_token(db: DBSession, user_id, hours_available):
     expires = datetime.datetime.utcnow() + datetime.timedelta(hours=hours_available)
     token = jwt.encode({
         "id": user_id,
-        "expires": expires.isoformat()
+        "expires": str(expires.isoformat())
     }, AUTH_KEY, algorithm="HS256")
     query = tokens_table.insert().values(
         token=token,
         expires=expires,
         owner=user_id
     )
+    decoded = jwt.decode(token, AUTH_KEY, algorithms=["HS256"])
+    print(decoded)
     await db.execute(query)
     await db.commit()
     return token
 
 
 async def get_user_id_from_token(db: DBSession, token: str):
+    print(token)
     try:
-        decoded = jwt.decode(token, AUTH_KEY, algorithm="HS256")
+        decoded = jwt.decode(token, AUTH_KEY, algorithms=["HS256"])
         print(decoded)
         return decoded["id"]
     except:
@@ -75,11 +78,16 @@ async def is_token_valid(db: DBSession, token: str):
 
 
 async def update_user_info(db: DBSession, user_info: UserInfo, user_id):
+    date = None
+    try:
+        date = datetime.datetime.strptime(user_info.birthdate, "%d.%m.%Y")
+    except:
+        pass
     query = users_table.update().where(users_table.c.id == user_id).values(
         email=user_info.email,
         name=user_info.name,
         surname=user_info.surname,
-        birthdate=user_info.birthdate,
+        birthdate=date,
         phone=user_info.phone,
         bio=user_info.bio
     )
@@ -92,7 +100,7 @@ def get_user_info_from_user(user):
     user_info["name"] = user["name"]
     user_info["surname"] = user["surname"]
     user_info["email"] = user["email"]
-    user_info["birthdate"] = user["birthdate"]
+    user_info["birthdate"] = user["birthdate"].strftime("%d.%m.%Y")
     user_info["phone"] = user["phone"]
     user_info["bio"] = user["bio"]
     return user_info
