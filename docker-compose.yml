@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: MASTER
+      POSTGRES_PASSWORD: MASTER
+      POSTGRES_DB: DB_MAIN
+      PGPORT: 31338
+    volumes:
+      - "db_main:/var/lib/postgresql/data"
+
+  main_api:
+    build: ./src/main
+    environment:
+      APP_PORT: 31337
+      APP_HOST: "0.0.0.0"
+      DB_USER: MASTER
+      DB_PASS: MASTER
+      DB_HOST: db
+      DB_PORT: 31338
+      DB_NAME: DB_MAIN
+      DATABASE_URL: postgresql+asyncpg://MASTER:MASTER@db:31338/DB_MAIN
+      AUTH_KEY: a-secret-i-will-never-ever-tell
+    ports:
+      - "31337:31337"
+    depends_on:
+      - db
+
+volumes:
+  db_main:
