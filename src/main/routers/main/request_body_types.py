@@ -5,9 +5,9 @@ class LoginPass(BaseModel):
     password: str
 
 class UserInfo(BaseModel):
-    name: str
-    surname: str
-    birthdate: str
-    email: str
-    phone: str
-    bio: str
+    name: str | None
+    surname: str | None
+    birthdate: str | None
+    email: str | None
+    phone: str | None
+    bio: str | None
