@@ -1,7 +1,7 @@
 from os import environ, system
 import grpc
-from proto import protocols_pb2
-from proto import protocols_pb2_grpc
+from proto import protocols_pb2 as protocols_pb2
+from proto import protocols_pb2_grpc as protocols_pb2_grpc
 from concurrent import futures
 from utilities.db_tools import *
 from database.db_session import get_db
@@ -87,7 +87,7 @@ class ContentService(protocols_pb2_grpc.ContentServiceServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=8))
     protocols_pb2_grpc.add_ContentServiceServicer_to_server(ContentService(), server)
-    server.add_insecure_port(HOST + PORT)
+    server.add_insecure_port(HOST + ":" + PORT)
     server.start()
     print("Server started, listening on " + PORT)
     server.wait_for_termination()

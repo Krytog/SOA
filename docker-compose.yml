@@ -1,6 +1,6 @@
 version: "3.9"
 services:
-  db:
+  db_main:
     image: postgres
     environment:
       POSTGRES_USER: MASTER
@@ -9,6 +9,16 @@ services:
       PGPORT: 31338
     volumes:
       - "db_main:/var/lib/postgresql/data"
+    
+#  db_content:
+#    image: postgres
+#    environment:
+#      POSTGRES_USER: MASTER_CONTENT
+#      POSTGRES_PASSWORD: MASTER_CONTENT
+#      POSTGRES_DB: DB_CONTENT
+#      PGPORT: 31340
+#    volumes:
+#      - "db_content:/var/lib/postgresql/data"
 
   main_api:
     build: ./src/main
@@ -17,15 +27,33 @@ services:
       APP_HOST: "0.0.0.0"
       DB_USER: MASTER
       DB_PASS: MASTER
-      DB_HOST: db
+      DB_HOST: db_main
       DB_PORT: 31338
       DB_NAME: DB_MAIN
       DATABASE_URL: postgresql+asyncpg://MASTER:MASTER@db:31338/DB_MAIN
       AUTH_KEY: a-secret-i-will-never-ever-tell
+      GRPC_SERVER_CONTENT: "0.0.0.0:31339"
     ports:
       - "31337:31337"
     depends_on:
-      - db
+      - db_main
+      #- content_service
+
+#  content_service:
+#    build: ./src/content_service
+#    environment:
+#      APP_PORT: 31339
+#      APP_HOST: "0.0.0.0"
+#      DB_USER: MASTER_CONTENT
+#      DB_PASS: MASTER_CONTENT
+#      DB_HOST: db_content
+#      DB_PORT: 31340
+#      DB_NAME: DB_CONTENT
+#      DATABASE_URL: postgresql+asyncpg://MASTER_CONTENT:MASTER_CONTENT@db:31340/DB_CONTENT
+#      AUTH_KEY: a-secret-i-will-never-ever-tell
+#    depends_on:
+#      - db_content
 
 volumes:
   db_main:
+  db_content:
