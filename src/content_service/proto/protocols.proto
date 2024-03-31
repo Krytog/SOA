@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package contents_service_grpc;
+
+option go_package = "proto/;contents_service_grpc";
+
+message CreatePostRequest {
+    uint64 author_id = 1;
+    string content = 2;
+}
+
+message UpdatePostRequest {
+    uint64 post_id = 1;
+    string new_content = 2;
+}
+
+message PostId {
+    uint64 post_id = 1;
+}
+
+message StatusResponse {
+    bool success = 1;
+}
+
+message PostResponse {
+    uint64 post_id = 1;
+    uint64 author_id = 2;
+    string content = 3;
+    google.protobuf.Timestamp created = 4;
+    google.protobuf.Timestamp last_modified = 5;
+}
+
+message PostsListRequest {
+    uint64 user_id = 1;
+    uint64 page_num = 2;
+    uint64 page_size = 3;
+}
+
+message PostsListResponse {
+    repeated PostResponse posts = 1;
+}
+
+service ContentService {
+   rpc CreatePost(CreatePostRequest) returns (PostId) {}
+
+   rpc UpdatePost(UpdatePostRequest) returns (StatusResponse) {}
+
+   rpc DeletePost(PostId) returns (StatusResponse) {}
+
+   rpc GetPost(PostId) returns (PostResponse) {}
+
+   rpc GetPostsList(PostsListRequest) returns (PostsListResponse) {}
+}
