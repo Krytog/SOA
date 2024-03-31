@@ -7,12 +7,13 @@ from typing_extensions import Annotated
 from routers.main.request_body_types import LoginPass, UserInfo
 from utilities.security import is_password_valid
 from utilities.db_tools import *
-from database.db_session import DBSession
+from database.db_session import DBSession, get_db
 
 router = APIRouter()
 
 
-async def get_auth_error(db: DBSession, auth):
+async def get_auth_error(auth):
+    db = get_db()
     if auth is None:
         return JSONResponse(content={"message": "No auth token"}, status_code=status.HTTP_403_FORBIDDEN)
     token_valid = await is_token_valid(db, auth)
@@ -41,7 +42,7 @@ async def login_user(db: DBSession, data: LoginPass):
 
 @router.put("/api/update")
 async def update_user(db: DBSession, data: UserInfo, auth: Annotated[str, Header()] = None):
-    auth_error = await get_auth_error(db, auth)
+    auth_error = await get_auth_error(auth)
     if auth_error is not None:
         return auth_error
     user_id = await get_user_id_from_token(db, auth)
@@ -50,7 +51,7 @@ async def update_user(db: DBSession, data: UserInfo, auth: Annotated[str, Header
 
 
 @router.get("/api/about/{user_login}")
-async def update_user(db: DBSession, user_login):
+async def get_about_user(db: DBSession, user_login):
     user = await get_user_by_login(db, user_login)
     if user is None:
         return JSONResponse(content={"message": "Such user doesn't exist"}, status_code=status.HTTP_404_NOT_FOUND)
