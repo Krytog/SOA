@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fprotocols.proto\x12\x15\x63ontents_service_grpc\x1a\x1fgoogle/protobuf/timestamp.proto\"7\n\x11\x43reatePostRequest\x12\x11\n\tauthor_id\x18\x01 \x01(\x04\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"9\n\x11UpdatePostRequest\x12\x0f\n\x07post_id\x18\x01 \x01(\x04\x12\x13\n\x0bnew_content\x18\x02 \x01(\t\"\x19\n\x06PostId\x12\x0f\n\x07post_id\x18\x01 \x01(\x04\"!\n\x0eStatusResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"\xa3\x01\n\x0cPostResponse\x12\x0f\n\x07post_id\x18\x01 \x01(\x04\x12\x11\n\tauthor_id\x18\x02 \x01(\x04\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\x12+\n\x07\x63reated\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x31\n\rlast_modified\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"H\n\x10PostsListRequest\x12\x0f\n\x07user_id\x18\x01 \x01(\x04\x12\x10\n\x08page_num\x18\x02 \x01(\x04\x12\x11\n\tpage_size\x18\x03 \x01(\x04\"G\n\x11PostsListResponse\x12\x32\n\x05posts\x18\x01 \x03(\x0b\x32#.contents_service_grpc.PostResponse2\xd6\x03\n\x0e\x43ontentService\x12W\n\nCreatePost\x12(.contents_service_grpc.CreatePostRequest\x1a\x1d.contents_service_grpc.PostId\"\x00\x12_\n\nUpdatePost\x12(.contents_service_grpc.UpdatePostRequest\x1a%.contents_service_grpc.StatusResponse\"\x00\x12T\n\nDeletePost\x12\x1d.contents_service_grpc.PostId\x1a%.contents_service_grpc.StatusResponse\"\x00\x12O\n\x07GetPost\x12\x1d.contents_service_grpc.PostId\x1a#.contents_service_grpc.PostResponse\"\x00\x12\x63\n\x0cGetPostsList\x12\'.contents_service_grpc.PostsListRequest\x1a(.contents_service_grpc.PostsListResponse\"\x00\x42\x1eZ\x1cproto/;contents_service_grpcb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0fprotocols.proto\x12\x15\x63ontents_service_grpc\x1a\x1fgoogle/protobuf/timestamp.proto\"7\n\x11\x43reatePostRequest\x12\x11\n\tauthor_id\x18\x01 \x01(\x04\x12\x0f\n\x07\x63ontent\x18\x02 \x01(\t\"J\n\x11UpdatePostRequest\x12\x0f\n\x07user_id\x18\x01 \x01(\x04\x12\x0f\n\x07post_id\x18\x02 \x01(\x04\x12\x13\n\x0bnew_content\x18\x03 \x01(\t\"\x19\n\x06PostId\x12\x0f\n\x07post_id\x18\x01 \x01(\x04\"!\n\x0eStatusResponse\x12\x0f\n\x07success\x18\x01 \x01(\x08\"\xa3\x01\n\x0cPostResponse\x12\x0f\n\x07post_id\x18\x01 \x01(\x04\x12\x11\n\tauthor_id\x18\x02 \x01(\x04\x12\x0f\n\x07\x63ontent\x18\x03 \x01(\t\x12+\n\x07\x63reated\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x31\n\rlast_modified\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"H\n\x10PostsListRequest\x12\x0f\n\x07user_id\x18\x01 \x01(\x04\x12\x10\n\x08page_num\x18\x02 \x01(\x04\x12\x11\n\tpage_size\x18\x03 \x01(\x04\"G\n\x11PostsListResponse\x12\x32\n\x05posts\x18\x01 \x03(\x0b\x32#.contents_service_grpc.PostResponse\"5\n\x11\x44\x65letePostRequest\x12\x0f\n\x07user_id\x18\x01 \x01(\x04\x12\x0f\n\x07post_id\x18\x02 \x01(\x04\x32\xe1\x03\n\x0e\x43ontentService\x12W\n\nCreatePost\x12(.contents_service_grpc.CreatePostRequest\x1a\x1d.contents_service_grpc.PostId\"\x00\x12_\n\nUpdatePost\x12(.contents_service_grpc.UpdatePostRequest\x1a%.contents_service_grpc.StatusResponse\"\x00\x12_\n\nDeletePost\x12(.contents_service_grpc.DeletePostRequest\x1a%.contents_service_grpc.StatusResponse\"\x00\x12O\n\x07GetPost\x12\x1d.contents_service_grpc.PostId\x1a#.contents_service_grpc.PostResponse\"\x00\x12\x63\n\x0cGetPostsList\x12\'.contents_service_grpc.PostsListRequest\x1a(.contents_service_grpc.PostsListResponse\"\x00\x42\x1eZ\x1cproto/;contents_service_grpcb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -26,17 +26,19 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_CREATEPOSTREQUEST']._serialized_start=75
   _globals['_CREATEPOSTREQUEST']._serialized_end=130
   _globals['_UPDATEPOSTREQUEST']._serialized_start=132
-  _globals['_UPDATEPOSTREQUEST']._serialized_end=189
-  _globals['_POSTID']._serialized_start=191
-  _globals['_POSTID']._serialized_end=216
-  _globals['_STATUSRESPONSE']._serialized_start=218
-  _globals['_STATUSRESPONSE']._serialized_end=251
-  _globals['_POSTRESPONSE']._serialized_start=254
-  _globals['_POSTRESPONSE']._serialized_end=417
-  _globals['_POSTSLISTREQUEST']._serialized_start=419
-  _globals['_POSTSLISTREQUEST']._serialized_end=491
-  _globals['_POSTSLISTRESPONSE']._serialized_start=493
-  _globals['_POSTSLISTRESPONSE']._serialized_end=564
-  _globals['_CONTENTSERVICE']._serialized_start=567
-  _globals['_CONTENTSERVICE']._serialized_end=1037
+  _globals['_UPDATEPOSTREQUEST']._serialized_end=206
+  _globals['_POSTID']._serialized_start=208
+  _globals['_POSTID']._serialized_end=233
+  _globals['_STATUSRESPONSE']._serialized_start=235
+  _globals['_STATUSRESPONSE']._serialized_end=268
+  _globals['_POSTRESPONSE']._serialized_start=271
+  _globals['_POSTRESPONSE']._serialized_end=434
+  _globals['_POSTSLISTREQUEST']._serialized_start=436
+  _globals['_POSTSLISTREQUEST']._serialized_end=508
+  _globals['_POSTSLISTRESPONSE']._serialized_start=510
+  _globals['_POSTSLISTRESPONSE']._serialized_end=581
+  _globals['_DELETEPOSTREQUEST']._serialized_start=583
+  _globals['_DELETEPOSTREQUEST']._serialized_end=636
+  _globals['_CONTENTSERVICE']._serialized_start=639
+  _globals['_CONTENTSERVICE']._serialized_end=1120
 # @@protoc_insertion_point(module_scope)

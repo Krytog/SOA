@@ -12,8 +12,9 @@ message CreatePostRequest {
 }
 
 message UpdatePostRequest {
-    uint64 post_id = 1;
-    string new_content = 2;
+    uint64 user_id = 1;
+    uint64 post_id = 2;
+    string new_content = 3;
 }
 
 message PostId {
@@ -42,12 +43,17 @@ message PostsListResponse {
     repeated PostResponse posts = 1;
 }
 
+message DeletePostRequest {
+    uint64 user_id = 1;
+    uint64 post_id = 2;
+}
+
 service ContentService {
    rpc CreatePost(CreatePostRequest) returns (PostId) {}
 
    rpc UpdatePost(UpdatePostRequest) returns (StatusResponse) {}
 
-   rpc DeletePost(PostId) returns (StatusResponse) {}
+   rpc DeletePost(DeletePostRequest) returns (StatusResponse) {}
 
    rpc GetPost(PostId) returns (PostResponse) {}
 

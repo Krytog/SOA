@@ -26,7 +26,7 @@ class ContentServiceStub(object):
                 )
         self.DeletePost = channel.unary_unary(
                 '/contents_service_grpc.ContentService/DeletePost',
-                request_serializer=protocols__pb2.PostId.SerializeToString,
+                request_serializer=protocols__pb2.DeletePostRequest.SerializeToString,
                 response_deserializer=protocols__pb2.StatusResponse.FromString,
                 )
         self.GetPost = channel.unary_unary(
@@ -89,7 +89,7 @@ def add_ContentServiceServicer_to_server(servicer, server):
             ),
             'DeletePost': grpc.unary_unary_rpc_method_handler(
                     servicer.DeletePost,
-                    request_deserializer=protocols__pb2.PostId.FromString,
+                    request_deserializer=protocols__pb2.DeletePostRequest.FromString,
                     response_serializer=protocols__pb2.StatusResponse.SerializeToString,
             ),
             'GetPost': grpc.unary_unary_rpc_method_handler(
@@ -158,7 +158,7 @@ class ContentService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/contents_service_grpc.ContentService/DeletePost',
-            protocols__pb2.PostId.SerializeToString,
+            protocols__pb2.DeletePostRequest.SerializeToString,
             protocols__pb2.StatusResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -15,12 +15,14 @@ class CreatePostRequest(_message.Message):
     def __init__(self, author_id: _Optional[int] = ..., content: _Optional[str] = ...) -> None: ...
 
 class UpdatePostRequest(_message.Message):
-    __slots__ = ["post_id", "new_content"]
+    __slots__ = ["user_id", "post_id", "new_content"]
+    USER_ID_FIELD_NUMBER: _ClassVar[int]
     POST_ID_FIELD_NUMBER: _ClassVar[int]
     NEW_CONTENT_FIELD_NUMBER: _ClassVar[int]
+    user_id: int
     post_id: int
     new_content: str
-    def __init__(self, post_id: _Optional[int] = ..., new_content: _Optional[str] = ...) -> None: ...
+    def __init__(self, user_id: _Optional[int] = ..., post_id: _Optional[int] = ..., new_content: _Optional[str] = ...) -> None: ...
 
 class PostId(_message.Message):
     __slots__ = ["post_id"]
@@ -63,3 +65,11 @@ class PostsListResponse(_message.Message):
     POSTS_FIELD_NUMBER: _ClassVar[int]
     posts: _containers.RepeatedCompositeFieldContainer[PostResponse]
     def __init__(self, posts: _Optional[_Iterable[_Union[PostResponse, _Mapping]]] = ...) -> None: ...
+
+class DeletePostRequest(_message.Message):
+    __slots__ = ["user_id", "post_id"]
+    USER_ID_FIELD_NUMBER: _ClassVar[int]
+    POST_ID_FIELD_NUMBER: _ClassVar[int]
+    user_id: int
+    post_id: int
+    def __init__(self, user_id: _Optional[int] = ..., post_id: _Optional[int] = ...) -> None: ...
