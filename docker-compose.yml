@@ -30,7 +30,7 @@ services:
       DB_HOST: db_main
       DB_PORT: 31338
       DB_NAME: DB_MAIN
-      DATABASE_URL: postgresql+asyncpg://MASTER:MASTER@db:31338/DB_MAIN
+      DATABASE_URL: postgresql+asyncpg://MASTER:MASTER@db_main:31338/DB_MAIN
       AUTH_KEY: a-secret-i-will-never-ever-tell
       GRPC_SERVER_CONTENT: "0.0.0.0:31339"
     ports:
@@ -49,7 +49,7 @@ services:
       DB_HOST: db_content
       DB_PORT: 31340
       DB_NAME: DB_CONTENT
-      DATABASE_URL: postgresql+asyncpg://MASTER_CONTENT:MASTER_CONTENT@db:31340/DB_CONTENT
+      DATABASE_URL: postgresql+asyncpg://MASTER_CONTENT:MASTER_CONTENT@db_content:31340/DB_CONTENT
       AUTH_KEY: a-secret-i-will-never-ever-tell
     depends_on:
       - db_content
