@@ -139,7 +139,7 @@ paths:
                     type: string
 
   /api/content/create_post:
-    put:
+    post:
       summary: 'Creates a post'
       security:
         - bearerAuth: []
@@ -174,64 +174,15 @@ paths:
                   message:
                     type: string
 
-  /api/update:
-    put:
-      summary: 'Update user's info'
-      security:
-        - bearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                surname:
-                  type: string
-                birthdate:
-                  type: string
-                  format: date
-                email:
-                  type: string
-                  format: email
-                phone:
-                  type: string
-                bio:
-                  type: string
-              required:
-                - name
-                - surname
-                - birthdate
-                - email
-                - phone
-                - bio
-      responses:
-        '200':
-          description: 'Successfully updated'
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-
-        '403':
-          description: 'Auth failed'
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-
   /api/content/update_post/{post_id}:
     put:
       summary: 'Updates a post'
       security:
         - bearerAuth: []
+      parameters:
+        - name: post_id
+          in: path
+          required: true  
       requestBody:
         content:
           application/json:
@@ -263,61 +214,8 @@ paths:
                   message:
                     type: string
 
-  /api/update:
-    put:
-      summary: 'Update user's info'
-      security:
-        - bearerAuth: []
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                surname:
-                  type: string
-                birthdate:
-                  type: string
-                  format: date
-                email:
-                  type: string
-                  format: email
-                phone:
-                  type: string
-                bio:
-                  type: string
-              required:
-                - name
-                - surname
-                - birthdate
-                - email
-                - phone
-                - bio
-      responses:
-        '200':
-          description: 'Successfully updated'
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-
-        '403':
-          description: 'Auth failed'
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-
-        '406':
-          description: 'Failed'
+        '404':
+          description: 'Not found'
           content:
             application/json:
               schema:
@@ -331,6 +229,10 @@ paths:
       summary: 'Deletes a post'
       security:
         - bearerAuth: []
+      parameters:
+        - name: post_id
+          in: path
+          required: true 
       responses:
         '200':
           description: 'Successfully created'
@@ -363,8 +265,14 @@ paths:
                     type: string
 
   /api/content/get_post/{post_id}:
-    put:
+    get:
       summary: 'Returns a post by its id'
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: post_id
+          in: path
+          required: true 
       responses:
         '200':
           description: 'Returns resulting post or none'
@@ -375,6 +283,71 @@ paths:
                 properties:
                   post:
                     type: object
+                    properties:
+                      id:
+                        type: int
+                      author_id:
+                        type: int
+                      content:
+                        type: string
+                      last_modefied:
+                        type: string
+                      created:
+                        type: string
+                    required:
+                      - id
+                      - author_id
+                      - content
+                      - last_modified
+                      - created
+                      
+  /api/content/get_listspost:
+    get:
+      summary: 'Returns a post by its id'
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: int
+                page:
+                  type: int
+                per_page:
+                  type: int
+              required:
+                - content
+                - page
+                - per_page
+      responses:
+        '200':
+          description: 'Returns resulting posts'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: int
+                    author_id:
+                      type: int
+                    content:
+                      type: string
+                    last_modefied:
+                      type: string
+                    created:
+                      type: string
+                  required:
+                      - id
+                      - author_id
+                      - content
+                      - last_modified
+                      - created
 
 components:
   securitySchemes:
