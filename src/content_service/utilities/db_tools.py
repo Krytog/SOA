@@ -19,7 +19,7 @@ async def exists(db: DBSession, post_id: int):
 
 
 async def create_post(db: DBSession, user_id: int, content: str):
-    create_time = datetime.datetime.now(datetime.UTC)
+    create_time = datetime.datetime.now(datetime.timezone.utc)
     query = posts_table.insert().values(
         author_id=user_id,
         content=content,
@@ -28,13 +28,13 @@ async def create_post(db: DBSession, user_id: int, content: str):
     )
     result = await db.execute(query)
     await db.commit()
-    return result.inserted_primary_key
+    return result.inserted_primary_key[0]
 
 
 async def update_post(db: DBSession, post_id: int, new_content: str):
     query = posts_table.update().where(posts_table.c.id == post_id).values(
         content=new_content,
-        last_modified=datetime.datetime.now(datetime.UTC),
+        last_modified=datetime.datetime.now(datetime.timezone.utc),
     )
     await db.execute(query)
     await db.commit()

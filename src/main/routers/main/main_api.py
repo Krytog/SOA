@@ -12,8 +12,7 @@ from database.db_session import DBSession, get_db
 router = APIRouter()
 
 
-async def get_auth_error(auth):
-    db = get_db()
+async def get_auth_error(db: DBSession, auth):
     if auth is None:
         return JSONResponse(content={"message": "No auth token"}, status_code=status.HTTP_403_FORBIDDEN)
     token_valid = await is_token_valid(db, auth)
@@ -42,10 +41,10 @@ async def login_user(db: DBSession, data: LoginPass):
 
 @router.put("/api/update")
 async def update_user(db: DBSession, data: UserInfo, auth: Annotated[str, Header()] = None):
-    auth_error = await get_auth_error(auth)
+    auth_error = await get_auth_error(db, auth)
     if auth_error is not None:
         return auth_error
-    user_id = await get_user_id_from_token(db, auth)
+    user_id = await get_user_id_from_token(auth)
     await update_user_info(db, data, user_id)
     return JSONResponse(content={"message": "Info is successfully updated"}, status_code=status.HTTP_200_OK)
 

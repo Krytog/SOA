@@ -32,7 +32,7 @@ services:
       DB_NAME: DB_MAIN
       DATABASE_URL: postgresql+asyncpg://MASTER:MASTER@db_main:31338/DB_MAIN
       AUTH_KEY: a-secret-i-will-never-ever-tell
-      GRPC_SERVER_CONTENT: "0.0.0.0:31339"
+      GRPC_SERVER_CONTENT: content_service:31339
     ports:
       - "31337:31337"
     depends_on:

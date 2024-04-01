@@ -4,8 +4,9 @@ from proto import protocols_pb2 as protocols_pb2
 from proto import protocols_pb2_grpc as protocols_pb2_grpc
 from concurrent import futures
 from utilities.db_tools import *
-from database.db_session import get_db
-
+from database.db_session import SessionLocal
+import asyncio
+from google.protobuf.timestamp_pb2 import Timestamp
 
 HOST = environ.get("APP_HOST")
 PORT = environ.get("APP_PORT")
@@ -13,15 +14,15 @@ PORT = environ.get("APP_PORT")
 
 class ContentService(protocols_pb2_grpc.ContentServiceServicer):
     async def CreatePost(self, request, context):
-        db = await get_db()
+        db = SessionLocal()
         try:
-            post_id = await create_post(db, request.author, request.content)
+            post_id = await create_post(db, request.author_id, request.content)
             return protocols_pb2.PostId(post_id=post_id)
         except Exception as e:
-            context.abort(grpc.StatusCode.INTERNAL, str(e))
+            await context.abort(grpc.StatusCode.INTERNAL, str(e))
 
     async def UpdatePost(self, request, context):
-        db = await get_db()
+        db = SessionLocal()
         try:
             post_is_valid = await exists(db, request.post_id)
             if not post_is_valid:
@@ -35,7 +36,7 @@ class ContentService(protocols_pb2_grpc.ContentServiceServicer):
             context.abort(grpc.StatusCode.INTERNAL, str(e))
 
     async def DeletePost(self, request, context):
-        db = await get_db()
+        db = SessionLocal()
         try:
             post_is_valid = await exists(db, request.post_id)
             if not post_is_valid:
@@ -49,31 +50,35 @@ class ContentService(protocols_pb2_grpc.ContentServiceServicer):
             context.abort(grpc.StatusCode.INTERNAL, str(e))
 
     async def GetPost(self, request, context):
-        db = await get_db()
+        db = SessionLocal()
         try:
             post_is_valid = await exists(db, request.post_id)
             if not post_is_valid:
-                return protocols_pb2.StatusResponse(success=False)
+                await context.abort(grpc.StatusCode.NOT_FOUND, "no such post")
             post = await get_post(db, request.post_id)
+            created = Timestamp()
+            created.FromDatetime(post["created"])
+            last_modified = Timestamp()
+            last_modified.FromDatetime(post["last_modified"])
             return protocols_pb2.PostResponse(
                 post_id=post["id"],
-                author_id=post["author"],
+                author_id=post["author_id"],
                 content=post["content"],
-                last_modified=post["last_modified"].isoformat(),
-                created=post["created"].isoformat()
+                created=created,
+                last_modified=last_modified
             )
         except Exception as e:
-            context.abort(grpc.StatusCode.INTERNAL, str(e))
+            await context.abort(grpc.StatusCode.INTERNAL, str(e))
 
     async def GetPostsList(self, request, context):
-        db = await get_db()
+        db = SessionLocal()
         try:
             posts = await get_posts_list(db, request.user_id, request.page_num, request.page_size)
             output = []
             for post in posts:
                 post_ready = protocols_pb2.PostResponse(
                     post_id=post["id"],
-                    author_id=post["author"],
+                    author_id=post["author_id"],
                     content=post["content"],
                     last_modified=post["last_modified"].isoformat(),
                     created=post["created"].isoformat()
@@ -84,13 +89,13 @@ class ContentService(protocols_pb2_grpc.ContentServiceServicer):
             context.abort(grpc.StatusCode.INTERNAL, str(e))
 
 
-def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=8))
+async def serve():
+    server = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=8))
     protocols_pb2_grpc.add_ContentServiceServicer_to_server(ContentService(), server)
     server.add_insecure_port(HOST + ":" + PORT)
-    server.start()
+    await server.start()
     print("Server started, listening on " + PORT)
-    server.wait_for_termination()
+    await server.wait_for_termination()
 
 
 def init_db():
@@ -100,4 +105,4 @@ def init_db():
 
 if __name__ == "__main__":
     init_db()
-    serve()
+    asyncio.run(serve())

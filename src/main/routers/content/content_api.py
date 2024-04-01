@@ -11,8 +11,9 @@ from os import environ
 import grpc
 from proto.protocols_pb2_grpc import *
 from proto.protocols_pb2 import *
-from database.db_session import get_db
+from database.db_session import DBSession
 from utilities.db_tools import get_user_id_from_token
+import datetime
 
 
 grpc_channel = grpc.insecure_channel(environ.get("GRPC_SERVER_CONTENT"))
@@ -22,8 +23,8 @@ router = APIRouter()
 
 
 @router.put("/api/content/create_post")
-async def create_post(content: PostContent, auth: Annotated[str, Header()] = None):
-    auth_error = await get_auth_error(auth)
+async def create_post(db: DBSession, content: PostContent, auth: Annotated[str, Header()] = None):
+    auth_error = await get_auth_error(db, auth)
     if auth_error is not None:
         return auth_error
     user_id = await get_user_id_from_token(auth)
@@ -31,12 +32,12 @@ async def create_post(content: PostContent, auth: Annotated[str, Header()] = Non
         author_id=user_id,
         content=content.content
     ))
-    return JSONResponse(content={"message": "created post id is " + str(result)}, status_code=status.HTTP_200_OK)
+    return JSONResponse(content={"message": "created post id is " + str(result.post_id)}, status_code=status.HTTP_200_OK)
 
 
 @router.put("/api/content/update_post/{post_id}")
-async def update_post(post_id: int, content: PostContent, auth: Annotated[str, Header()] = None):
-    auth_error = await get_auth_error(auth)
+async def update_post(db: DBSession, post_id: int, content: PostContent, auth: Annotated[str, Header()] = None):
+    auth_error = await get_auth_error(db, auth)
     if auth_error is not None:
         return auth_error
     user_id = await get_user_id_from_token(auth)
@@ -51,8 +52,8 @@ async def update_post(post_id: int, content: PostContent, auth: Annotated[str, H
 
 
 @router.put("/api/content/delete_post/{post_id}")
-async def delete_post(post_id: int, auth: Annotated[str, Header()] = None):
-    auth_error = await get_auth_error(auth)
+async def delete_post(db: DBSession, post_id: int, auth: Annotated[str, Header()] = None):
+    auth_error = await get_auth_error(db, auth)
     if auth_error is not None:
         return auth_error
     user_id = await get_user_id_from_token(auth)
@@ -66,19 +67,22 @@ async def delete_post(post_id: int, auth: Annotated[str, Header()] = None):
 
 
 @router.put("/api/content/get_post/{post_id}")
-async def get_post(post_id: int, auth: Annotated[str, Header()] = None):
-    auth_error = await get_auth_error(auth)
+async def get_post(db: DBSession, post_id: int, auth: Annotated[str, Header()] = None):
+    auth_error = await get_auth_error(db, auth)
     if auth_error is not None:
-        return auth_error
-    result = grpc_stub.GetPost(PostId(
-        post_id=post_id
-    ))
-    return JSONResponse(content={"post": result}, status_code=status.HTTP_200_OK)
+        return auth_error   
+    try:
+        result = grpc_stub.GetPost(PostId(
+            post_id=post_id
+        ))
+        return JSONResponse(content=get_json_from_post_response(result), status_code=status.HTTP_200_OK)
+    except:
+        return JSONResponse(content={"message": "no such post"}, status_code=status.HTTP_404_NOT_FOUND)
 
 
 @router.put("/api/content/get_postslist")
-async def get_postslist(data: PostsList, auth: Annotated[str, Header()] = None):
-    auth_error = await get_auth_error(auth)
+async def get_postslist(db: DBSession, data: PostsList, auth: Annotated[str, Header()] = None):
+    auth_error = await get_auth_error(db, auth)
     if auth_error is not None:
         return auth_error
     result = grpc_stub.GetPostsList(PostsListRequest(
@@ -87,3 +91,10 @@ async def get_postslist(data: PostsList, auth: Annotated[str, Header()] = None):
         page_size=data.per_page
     ))
     return JSONResponse(content={"post": result}, status_code=status.HTTP_200_OK)
+
+
+def get_json_from_post_response(data):
+    output = {"post_id": data.post_id, "content": data.content, 
+              "author_id": data.author_id, "last_modified": data.last_modified.ToDatetime().isoformat(),
+              "created": data.created.ToDatetime().isoformat()}
+    return output
