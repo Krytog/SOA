@@ -1,0 +1,65 @@
+version: "3.9"
+services:
+  db_main:
+    image: postgres
+    environment:
+      POSTGRES_USER: MASTER
+      POSTGRES_PASSWORD: MASTER
+      POSTGRES_DB: DB_MAIN
+      PGPORT: 31338
+    volumes:
+      - "db_main_test:/var/lib/postgresql/data"
+    
+  db_content:
+    image: postgres
+    environment:
+      POSTGRES_USER: MASTER_CONTENT
+      POSTGRES_PASSWORD: MASTER_CONTENT
+      POSTGRES_DB: DB_CONTENT
+      PGPORT: 31340
+    volumes:
+      - "db_content_test:/var/lib/postgresql/data"
+
+  main_api:
+    build: ../src/main
+    environment:
+      APP_PORT: 31337
+      APP_HOST: "0.0.0.0"
+      DB_USER: MASTER
+      DB_PASS: MASTER
+      DB_HOST: db_main
+      DB_PORT: 31338
+      DB_NAME: DB_MAIN
+      DATABASE_URL: postgresql+asyncpg://MASTER:MASTER@db_main:31338/DB_MAIN
+      AUTH_KEY: a-secret-i-will-never-ever-tell
+      GRPC_SERVER_CONTENT: content_service:31339
+    depends_on:
+      - db_main
+      - content_service
+
+  content_service:
+    build: ../src/content_service
+    environment:
+      APP_PORT: 31339
+      APP_HOST: "0.0.0.0"
+      DB_USER: MASTER_CONTENT
+      DB_PASS: MASTER_CONTENT
+      DB_HOST: db_content
+      DB_PORT: 31340
+      DB_NAME: DB_CONTENT
+      DATABASE_URL: postgresql+asyncpg://MASTER_CONTENT:MASTER_CONTENT@db_content:31340/DB_CONTENT
+      AUTH_KEY: a-secret-i-will-never-ever-tell
+    depends_on:
+      - db_content
+
+  test:
+    build: ./tests_auth
+    environment:
+      TARGET_HOST: main_api
+      TARGET_PORT: 31337
+    depends_on:
+      - main_api
+
+volumes:
+  db_main_test:
+  db_content_test:
