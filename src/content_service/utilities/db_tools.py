@@ -8,7 +8,7 @@ async def is_author(db: DBSession, post_id: int, user_id: int):
     query = posts_table.select().where(posts_table.c.id == post_id)
     result = await db.execute(query)
     result_as_dict = result.mappings().all()[0]
-    return result_as_dict["author"] == user_id
+    return result_as_dict["author_id"] == user_id
 
 
 async def exists(db: DBSession, post_id: int):

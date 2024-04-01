@@ -22,7 +22,7 @@ grpc_stub = ContentServiceStub(grpc_channel)
 router = APIRouter()
 
 
-@router.put("/api/content/create_post")
+@router.post("/api/content/create_post")
 async def create_post(db: DBSession, content: PostContent, auth: Annotated[str, Header()] = None):
     auth_error = await get_auth_error(db, auth)
     if auth_error is not None:
@@ -42,9 +42,9 @@ async def update_post(db: DBSession, post_id: int, content: PostContent, auth: A
         return auth_error
     user_id = await get_user_id_from_token(auth)
     result = grpc_stub.UpdatePost(UpdatePostRequest(
-        author_id=user_id,
+        user_id=user_id,
         post_id=post_id,
-        content=content.content
+        new_content=content.content
     ))
     if result:
         return JSONResponse(content={"message": "updated"}, status_code=status.HTTP_200_OK)
@@ -66,7 +66,7 @@ async def delete_post(db: DBSession, post_id: int, auth: Annotated[str, Header()
     return JSONResponse(content={"message": "failed to delete"}, status_code=status.HTTP_406_NOT_ACCEPTABLE)
 
 
-@router.put("/api/content/get_post/{post_id}")
+@router.get("/api/content/get_post/{post_id}")
 async def get_post(db: DBSession, post_id: int, auth: Annotated[str, Header()] = None):
     auth_error = await get_auth_error(db, auth)
     if auth_error is not None:
@@ -80,7 +80,7 @@ async def get_post(db: DBSession, post_id: int, auth: Annotated[str, Header()] =
         return JSONResponse(content={"message": "no such post"}, status_code=status.HTTP_404_NOT_FOUND)
 
 
-@router.put("/api/content/get_postslist")
+@router.get("/api/content/get_postslist")
 async def get_postslist(db: DBSession, data: PostsList, auth: Annotated[str, Header()] = None):
     auth_error = await get_auth_error(db, auth)
     if auth_error is not None:
