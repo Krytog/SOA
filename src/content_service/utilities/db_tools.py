@@ -54,7 +54,7 @@ async def get_post(db: DBSession, post_id: int):
 
 
 async def get_posts_list(db: DBSession, user_id: int, page: int, per_page: int):
-    query = posts_table.select().where(posts_table.c.author == user_id).order_by(
+    query = posts_table.select().where(posts_table.c.author_id == user_id).order_by(
         posts_table.c.created.desc()).offset(page * per_page).limit(per_page)
     result = await db.execute(query)
     result_as_dict = result.mappings().all()

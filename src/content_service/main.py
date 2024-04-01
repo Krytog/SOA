@@ -33,7 +33,7 @@ class ContentService(protocols_pb2_grpc.ContentServiceServicer):
             await update_post(db, request.post_id, request.new_content)
             return protocols_pb2.StatusResponse(success=True)
         except Exception as e:
-            context.abort(grpc.StatusCode.INTERNAL, str(e))
+            await context.abort(grpc.StatusCode.INTERNAL, str(e))
 
     async def DeletePost(self, request, context):
         db = SessionLocal()
@@ -47,7 +47,7 @@ class ContentService(protocols_pb2_grpc.ContentServiceServicer):
             await delete_post(db, request.post_id)
             return protocols_pb2.StatusResponse(success=True)
         except Exception as e:
-            context.abort(grpc.StatusCode.INTERNAL, str(e))
+            await context.abort(grpc.StatusCode.INTERNAL, str(e))
 
     async def GetPost(self, request, context):
         db = SessionLocal()
@@ -74,19 +74,23 @@ class ContentService(protocols_pb2_grpc.ContentServiceServicer):
         db = SessionLocal()
         try:
             posts = await get_posts_list(db, request.user_id, request.page_num, request.page_size)
-            output = []
+            output = protocols_pb2.PostsListResponse()
             for post in posts:
+                created = Timestamp()
+                created.FromDatetime(post["created"])
+                last_modified = Timestamp()
+                last_modified.FromDatetime(post["last_modified"])
                 post_ready = protocols_pb2.PostResponse(
                     post_id=post["id"],
                     author_id=post["author_id"],
                     content=post["content"],
-                    last_modified=post["last_modified"].isoformat(),
-                    created=post["created"].isoformat()
+                    last_modified=last_modified,
+                    created=created
                 )
-                output.append(post_ready)
+                output.posts.append(post_ready)
             return output
         except Exception as e:
-            context.abort(grpc.StatusCode.INTERNAL, str(e))
+            await context.abort(grpc.StatusCode.INTERNAL, str(e))
 
 
 async def serve():

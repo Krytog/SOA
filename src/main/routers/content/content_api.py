@@ -90,7 +90,10 @@ async def get_postslist(db: DBSession, data: PostsList, auth: Annotated[str, Hea
         page_num=data.page,
         page_size=data.per_page
     ))
-    return JSONResponse(content={"post": result}, status_code=status.HTTP_200_OK)
+    output = []
+    for post in result.posts:
+        output.append(get_json_from_post_response(post))
+    return JSONResponse(content={"posts": output}, status_code=status.HTTP_200_OK)
 
 
 def get_json_from_post_response(data):
