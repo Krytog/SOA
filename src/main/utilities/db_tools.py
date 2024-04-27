@@ -48,7 +48,7 @@ async def create_token(db: DBSession, user_id, hours_available):
     return token
 
 
-async def get_user_id_from_token(db: DBSession, token: str):
+async def get_user_id_from_token(token: str):
     print(token)
     try:
         decoded = jwt.decode(token, AUTH_KEY, algorithms=["HS256"])
@@ -60,7 +60,7 @@ async def get_user_id_from_token(db: DBSession, token: str):
 
 
 async def is_token_valid(db: DBSession, token: str):
-    user_id = await get_user_id_from_token(db, token)
+    user_id = await get_user_id_from_token(token)
     print("USER_ID:", user_id)
     if user_id is None:
         return False

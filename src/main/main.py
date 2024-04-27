@@ -1,11 +1,13 @@
 from fastapi import FastAPI
 from routers.main.main_api import router as main_api
+from routers.content.content_api import router as content_api
 from os import environ, system
 from contextlib import asynccontextmanager
 import uvicorn
 
 app = FastAPI()
 app.include_router(main_api)
+app.include_router(content_api)
 
 
 HOST = environ.get("APP_HOST")
