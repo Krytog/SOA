@@ -7,7 +7,7 @@ from typing_extensions import Annotated
 from routers.main.request_body_types import LoginPass, UserInfo
 from utilities.security import is_password_valid
 from utilities.db_tools import *
-from database.db_session import DBSession
+from database.db_session import DBSession, get_db
 
 router = APIRouter()
 
@@ -44,13 +44,13 @@ async def update_user(db: DBSession, data: UserInfo, auth: Annotated[str, Header
     auth_error = await get_auth_error(db, auth)
     if auth_error is not None:
         return auth_error
-    user_id = await get_user_id_from_token(db, auth)
+    user_id = await get_user_id_from_token(auth)
     await update_user_info(db, data, user_id)
     return JSONResponse(content={"message": "Info is successfully updated"}, status_code=status.HTTP_200_OK)
 
 
 @router.get("/api/about/{user_login}")
-async def update_user(db: DBSession, user_login):
+async def get_about_user(db: DBSession, user_login):
     user = await get_user_by_login(db, user_login)
     if user is None:
         return JSONResponse(content={"message": "Such user doesn't exist"}, status_code=status.HTTP_404_NOT_FOUND)

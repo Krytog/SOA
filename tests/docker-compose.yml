@@ -8,7 +8,7 @@ services:
       POSTGRES_DB: DB_MAIN
       PGPORT: 31338
     volumes:
-      - "db_main:/var/lib/postgresql/data"
+      - "db_main_test:/var/lib/postgresql/data"
     
   db_content:
     image: postgres
@@ -18,10 +18,10 @@ services:
       POSTGRES_DB: DB_CONTENT
       PGPORT: 31340
     volumes:
-      - "db_content:/var/lib/postgresql/data"
+      - "db_content_test:/var/lib/postgresql/data"
 
   main_api:
-    build: ./src/main
+    build: ../src/main
     environment:
       APP_PORT: 31337
       APP_HOST: "0.0.0.0"
@@ -33,14 +33,12 @@ services:
       DATABASE_URL: postgresql+asyncpg://MASTER:MASTER@db_main:31338/DB_MAIN
       AUTH_KEY: a-secret-i-will-never-ever-tell
       GRPC_SERVER_CONTENT: content_service:31339
-    ports:
-      - "31337:31337"
     depends_on:
       - db_main
       - content_service
 
   content_service:
-    build: ./src/content_service
+    build: ../src/content_service
     environment:
       APP_PORT: 31339
       APP_HOST: "0.0.0.0"
@@ -54,6 +52,14 @@ services:
     depends_on:
       - db_content
 
+  test:
+    build: ./tests_auth
+    environment:
+      TARGET_HOST: main_api
+      TARGET_PORT: 31337
+    depends_on:
+      - main_api
+
 volumes:
-  db_main:
-  db_content:
+  db_main_test:
+  db_content_test:
