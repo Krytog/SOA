@@ -9,3 +9,5 @@ asyncpg==0.29.0
 grpcio==1.58.0
 grpcio-tools==1.58.0
 aiokafka==0.10.0
+clickhouse_driver==0.2.7
+pandas==2.2.2

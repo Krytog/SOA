@@ -25,15 +25,12 @@ services:
       driver: none
 
   db_statistics:
-    image: bitnami/clickhouse:latest
-    environment:
-      CLICKHOUSE_ADMIN_USER: DB_STATISTICS
-      CLICKHOUSE_ADMIN_PASSWORD: DB_STATISTICS
-      CLICKHOUSE_HTTP_PORT: 31343
+    image: yandex/clickhouse-server:latest
     ports:
-      - "31343:31343"
+      - "9000:9000"
+      - "8123:8123"
     volumes:
-      - "db_statistics:/bitnami/clickhouse"
+      - "db_statistics:/var/lib/clickhouse"
       - "./src/statistics_service/init.sql:/docker-entrypoint-initdb.d/init.sql"
     depends_on:
       statistics_broker:
@@ -69,6 +66,9 @@ services:
       DB_NAME: DB_MAIN
       DATABASE_URL: postgresql+asyncpg://MASTER:MASTER@db_main:31338/DB_MAIN
       KAFKA_URL: statistics_broker:31341
+      CLICKHOUSE_URL: db_statistics:9000
+      CLICKHOUSE_USER: DB_STATISTICS
+      CLICKHOUSE_PASS: DB_STATISTICS
       AUTH_KEY: a-secret-i-will-never-ever-tell
       GRPC_SERVER_CONTENT: content_service:31339
     ports:
@@ -82,8 +82,8 @@ services:
         condition: service_started
       statistics_broker:
         condition: service_healthy
-    logging:
-      driver: none
+  #  logging:
+  #    driver: none
 
   content_service:
     build: ./src/content_service

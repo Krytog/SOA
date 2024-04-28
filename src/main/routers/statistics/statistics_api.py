@@ -18,6 +18,10 @@ from utilities.message_broker_wrapper import send_to_broker
 import datetime
 
 
+from clickhouse_driver import Client
+host, port = environ.get("CLICKHOUSE_URL").split(':')
+client = Client(host=host, port=port, user=environ.get('CLICKHOUSE_USER'), password=environ.get("CLICKHOUSE_PASS"))
+
 grpc_channel = grpc.insecure_channel(environ.get("GRPC_SERVER_CONTENT"))
 grpc_stub = ContentServiceStub(grpc_channel)
 
@@ -66,5 +70,47 @@ async def like_post(db: DBSession, producer: BrokerSession, post_id: TargetId, a
     try:
         await send_to_broker(producer=producer, msg_topic="likes", msg=msg)
         return JSONResponse(content={"liked": post_id.id}, status_code=status.HTTP_200_OK)
+    except:
+        return JSONResponse(content={"message": "like failed"}, status_code=status.HTTP_406_NOT_ACCEPTABLE)
+
+
+@router.get("/api/statistics/views/{post_id}")
+async def get_views(db: DBSession, producer: BrokerSession, post_id: int, auth: Annotated[str, Header()] = None):
+    auth_error = await get_auth_error(db, auth)
+    if auth_error is not None:
+        return auth_error
+    user_id = await get_user_id_from_token(auth)
+    try:
+        result = grpc_stub.GetPost(PostId(
+            post_id=post_id
+        ))
+    except:
+        return JSONResponse(content={"message": "no such post"}, status_code=status.HTTP_404_NOT_FOUND)
+    print('BEFORE SRAKA', flush=True)
+    data = client.execute(f'SELECT * FROM views WHERE post_id == {post_id}')
+    print('AFTER SRAKA', flush=True)
+    print(data, flush=True)                              
+    try:
+        return JSONResponse(content={"liked": post_id}, status_code=status.HTTP_200_OK)
+    except:
+        return JSONResponse(content={"message": "like failed"}, status_code=status.HTTP_406_NOT_ACCEPTABLE)
+    
+
+@router.get("/api/statistics/likes/{post_id}")
+async def get_likes(db: DBSession, producer: BrokerSession, post_id: int, auth: Annotated[str, Header()] = None):
+    auth_error = await get_auth_error(db, auth)
+    if auth_error is not None:
+        return auth_error
+    user_id = await get_user_id_from_token(auth)
+    try:
+        result = grpc_stub.GetPost(PostId(
+            post_id=post_id
+        ))
+    except:
+        return JSONResponse(content={"message": "no such post"}, status_code=status.HTTP_404_NOT_FOUND)
+    data = client.execute(f'SELECT * FROM likes WHERE post_id == {post_id}')
+    print(data, flush=True)                              
+    try:
+        return JSONResponse(content={"liked": post_id}, status_code=status.HTTP_200_OK)
     except:
         return JSONResponse(content={"message": "like failed"}, status_code=status.HTTP_406_NOT_ACCEPTABLE)

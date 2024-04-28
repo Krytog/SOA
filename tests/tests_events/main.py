@@ -57,6 +57,8 @@ URL_POST_CREATE = "/api/content/create_post"
 URL_POST_GET = "/api/content/get"
 URL_POST_VIEW = "/api/statistics/view"
 URL_POST_LIKE = "/api/statistics/like"
+URL_GET_VIEWS = "/api/statistics/views"
+URL_GET_LIKES = "/api/statistics/likes"
 
 
 def get_complete_url(raw_url):
@@ -144,3 +146,19 @@ def test_view_nonexisting_post():
     }
     response = requests.put(url, headers={'Auth': user_token}, json=body)
     assert response.status_code == 404
+
+def test_get_views():
+    post_id, user_token = get_post()
+    url = get_complete_url(URL_POST_LIKE)
+    body = {
+        "id": post_id
+    }
+    response = requests.put(url, headers={'Auth': user_token}, json=body)
+    print(response.json(), flush=True)
+    assert response.status_code == 200
+    url = get_complete_url(URL_GET_VIEWS)
+    url += ('/' + str(post_id))
+    response = requests.get(url, headers={'Auth': user_token})
+    print(response.json(), flush=True)
+    assert response.status_code == 200
+
