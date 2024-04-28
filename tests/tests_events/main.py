@@ -54,7 +54,7 @@ PORT = environ.get("TARGET_PORT")
 URL_SIGNUP = "/api/signup"
 URL_LOGIN = "/api/login"
 URL_POST_CREATE = "/api/content/create_post"
-URL_POST_GET = "/api/content/get"
+URL_POST_GET = "/api/content/get_post"
 URL_POST_VIEW = "/api/statistics/view"
 URL_POST_LIKE = "/api/statistics/like"
 URL_GET_VIEWS = "/api/statistics/views"
@@ -106,14 +106,20 @@ def test_create_post_correct():
     assert response.status_code == 200
 
 
-def test_create_post():
+def test_create_post_check_content():
     token = get_registered_user_token()
     url = get_complete_url(URL_POST_CREATE)
+    content = "This is a post, nothing special"
     body = {
-        "content": "This is a post, nothing special"
+        "content": content
     }
     response = requests.post(url, headers={'Auth': token}, json=body)
     assert response.status_code == 200
+    url = get_complete_url(URL_POST_GET)
+    url += ('/' + str(response.json().get("id")))
+    response = requests.get(url, headers={'Auth': token})
+    returned_content = response.json().get("content")
+    assert returned_content == content
 
 
 def test_view_post():
@@ -123,7 +129,6 @@ def test_view_post():
         "id": post_id
     }
     response = requests.put(url, headers={'Auth': user_token}, json=body)
-    print(response.json(), flush=True)
     assert response.status_code == 200
 
 
@@ -134,7 +139,6 @@ def test_like_post():
         "id": post_id
     }
     response = requests.put(url, headers={'Auth': user_token}, json=body)
-    print(response.json(), flush=True)
     assert response.status_code == 200
 
 
@@ -147,18 +151,82 @@ def test_view_nonexisting_post():
     response = requests.put(url, headers={'Auth': user_token}, json=body)
     assert response.status_code == 404
 
+
 def test_get_views():
+    post_id, user_token = get_post()
+    url = get_complete_url(URL_POST_VIEW)
+    body = {
+        "id": post_id
+    }
+    response = requests.put(url, headers={'Auth': user_token}, json=body)
+    assert response.status_code == 200
+    url = get_complete_url(URL_GET_VIEWS)
+    url += ('/' + str(post_id))
+    time.sleep(10)  # time for kafka and clickhouse to handle event
+    response = requests.get(url, headers={'Auth': user_token})
+    assert response.status_code == 200
+    assert response.json().get("views") == 1
+
+
+def test_like_nonexisting_post():
+    post_id, user_token = get_post()
+    url = get_complete_url(URL_POST_LIKE)
+    body = {
+        "id": 91828384991
+    }
+    response = requests.put(url, headers={'Auth': user_token}, json=body)
+    assert response.status_code == 404
+
+
+def test_get_likes():
     post_id, user_token = get_post()
     url = get_complete_url(URL_POST_LIKE)
     body = {
         "id": post_id
     }
     response = requests.put(url, headers={'Auth': user_token}, json=body)
-    print(response.json(), flush=True)
     assert response.status_code == 200
+    url = get_complete_url(URL_GET_LIKES)
+    url += ('/' + str(post_id))
+    time.sleep(10)  # time for kafka and clickhouse to handle event
+    response = requests.get(url, headers={'Auth': user_token})
+    assert response.status_code == 200
+    assert response.json().get("likes") == 1
+
+
+def test_get_multiple_views():
+    post_id, user_token = get_post()
+    count = 10
+    for _ in range(count):
+        user_token = get_registered_user_token()
+        url = get_complete_url(URL_POST_VIEW)
+        body = {
+            "id": post_id
+        }
+        response = requests.put(url, headers={'Auth': user_token}, json=body)
+        assert response.status_code == 200
     url = get_complete_url(URL_GET_VIEWS)
     url += ('/' + str(post_id))
+    time.sleep(10)  # time for kafka and clickhouse to handle event
     response = requests.get(url, headers={'Auth': user_token})
-    print(response.json(), flush=True)
     assert response.status_code == 200
+    assert response.json().get("views") == count
 
+
+def test_get_multiple_likes():
+    post_id, user_token = get_post()
+    count = 10
+    for _ in range(count):
+        user_token = get_registered_user_token()
+        url = get_complete_url(URL_POST_LIKE)
+        body = {
+            "id": post_id
+        }
+        response = requests.put(url, headers={'Auth': user_token}, json=body)
+        assert response.status_code == 200
+    url = get_complete_url(URL_GET_LIKES)
+    url += ('/' + str(post_id))
+    time.sleep(10)  # time for kafka and clickhouse to handle event
+    response = requests.get(url, headers={'Auth': user_token})
+    assert response.status_code == 200
+    assert response.json().get("likes") == count
