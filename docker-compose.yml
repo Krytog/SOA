@@ -9,6 +9,8 @@ services:
       PGPORT: 31338
     volumes:
       - "db_main:/var/lib/postgresql/data"
+    logging:
+      driver: none
     
   db_content:
     image: postgres
@@ -19,6 +21,41 @@ services:
       PGPORT: 31340
     volumes:
       - "db_content:/var/lib/postgresql/data"
+    logging:
+      driver: none
+
+  db_statistics:
+    image: bitnami/clickhouse:latest
+    environment:
+      CLICKHOUSE_ADMIN_USER: DB_STATISTICS
+      CLICKHOUSE_ADMIN_PASSWORD: DB_STATISTICS
+      CLICKHOUSE_HTTP_PORT: 31343
+    ports:
+      - "31343:31343"
+    volumes:
+      - "db_statistics:/bitnami/clickhouse"
+      - "./src/statistics_service/init.sql:/docker-entrypoint-initdb.d/init.sql"
+    depends_on:
+      statistics_broker:
+        condition: service_healthy
+    logging:
+      driver: none
+
+  statistics_broker:
+    image: bitnami/kafka:latest
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:31341,CONTROLLER://:31342
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@statistics_broker:31342
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+    ports:
+        - "31341:31341"
+    healthcheck:
+      test: ["CMD-SHELL", " netstat -an | grep -q 31341 | echo"]
+    logging:
+      driver: none
 
   main_api:
     build: ./src/main
@@ -31,13 +68,22 @@ services:
       DB_PORT: 31338
       DB_NAME: DB_MAIN
       DATABASE_URL: postgresql+asyncpg://MASTER:MASTER@db_main:31338/DB_MAIN
+      KAFKA_URL: statistics_broker:31341
       AUTH_KEY: a-secret-i-will-never-ever-tell
       GRPC_SERVER_CONTENT: content_service:31339
     ports:
       - "31337:31337"
     depends_on:
-      - db_main
-      - content_service
+      db_main:
+        condition: service_started
+      content_service:
+        condition: service_started
+      db_statistics:
+        condition: service_started
+      statistics_broker:
+        condition: service_healthy
+    logging:
+      driver: none
 
   content_service:
     build: ./src/content_service
@@ -53,7 +99,10 @@ services:
       AUTH_KEY: a-secret-i-will-never-ever-tell
     depends_on:
       - db_content
+    logging:
+      driver: none
 
 volumes:
   db_main:
   db_content:
+  db_statistics:

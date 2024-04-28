@@ -32,7 +32,7 @@ async def create_post(db: DBSession, content: PostContent, auth: Annotated[str, 
         author_id=user_id,
         content=content.content
     ))
-    return JSONResponse(content={"message": "created post id is " + str(result.post_id)}, status_code=status.HTTP_200_OK)
+    return JSONResponse(content={"id": str(result.post_id)}, status_code=status.HTTP_200_OK)
 
 
 @router.put("/api/content/update_post/{post_id}")
