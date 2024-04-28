@@ -20,7 +20,10 @@ import datetime
 
 from clickhouse_driver import Client
 host, port = environ.get("CLICKHOUSE_URL").split(':')
-client = Client(host=host, port=port, user=environ.get('CLICKHOUSE_USER'), password=environ.get("CLICKHOUSE_PASS"))
+
+import time
+time.sleep(10)  # time to let Clickhouse server to boot up
+client = Client(host=host, port=port)
 
 grpc_channel = grpc.insecure_channel(environ.get("GRPC_SERVER_CONTENT"))
 grpc_stub = ContentServiceStub(grpc_channel)
@@ -86,14 +89,11 @@ async def get_views(db: DBSession, producer: BrokerSession, post_id: int, auth: 
         ))
     except:
         return JSONResponse(content={"message": "no such post"}, status_code=status.HTTP_404_NOT_FOUND)
-    print('BEFORE SRAKA', flush=True)
-    data = client.execute(f'SELECT * FROM views WHERE post_id == {post_id}')
-    print('AFTER SRAKA', flush=True)
-    print(data, flush=True)                              
+    data = client.execute(f'SELECT count() FROM statistics.views WHERE post_id == {post_id}')                          
     try:
-        return JSONResponse(content={"liked": post_id}, status_code=status.HTTP_200_OK)
+        return JSONResponse(content={"views": data[0][0]}, status_code=status.HTTP_200_OK)
     except:
-        return JSONResponse(content={"message": "like failed"}, status_code=status.HTTP_406_NOT_ACCEPTABLE)
+        return JSONResponse(content={"message": "get views failed"}, status_code=status.HTTP_406_NOT_ACCEPTABLE)
     
 
 @router.get("/api/statistics/likes/{post_id}")
@@ -108,9 +108,9 @@ async def get_likes(db: DBSession, producer: BrokerSession, post_id: int, auth: 
         ))
     except:
         return JSONResponse(content={"message": "no such post"}, status_code=status.HTTP_404_NOT_FOUND)
-    data = client.execute(f'SELECT * FROM likes WHERE post_id == {post_id}')
+    data = client.execute(f'SELECT count() FROM statistics.likes WHERE post_id == {post_id}')
     print(data, flush=True)                              
     try:
-        return JSONResponse(content={"liked": post_id}, status_code=status.HTTP_200_OK)
+        return JSONResponse(content={"likes": data[0][0]}, status_code=status.HTTP_200_OK)
     except:
-        return JSONResponse(content={"message": "like failed"}, status_code=status.HTTP_406_NOT_ACCEPTABLE)
+        return JSONResponse(content={"message": "get likes failed"}, status_code=status.HTTP_406_NOT_ACCEPTABLE)
