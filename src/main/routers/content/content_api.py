@@ -9,8 +9,8 @@ from routers.content.request_body_types import PostContent, PostsList
 
 from os import environ
 import grpc
-from proto.protocols_pb2_grpc import *
-from proto.protocols_pb2 import *
+from proto.content.protocols_content_pb2_grpc import *
+from proto.content.protocols_content_pb2 import *
 from database.db_session import DBSession
 from utilities.db_tools import get_user_id_from_token
 import datetime

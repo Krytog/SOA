@@ -162,7 +162,7 @@ def test_get_views():
     assert response.status_code == 200
     url = get_complete_url(URL_GET_VIEWS)
     url += ('/' + str(post_id))
-    time.sleep(10)  # time for kafka and clickhouse to handle event
+    time.sleep(15)  # time for kafka and clickhouse to handle event
     response = requests.get(url, headers={'Auth': user_token})
     assert response.status_code == 200
     assert response.json().get("views") == 1
@@ -188,7 +188,7 @@ def test_get_likes():
     assert response.status_code == 200
     url = get_complete_url(URL_GET_LIKES)
     url += ('/' + str(post_id))
-    time.sleep(10)  # time for kafka and clickhouse to handle event
+    time.sleep(15)  # time for kafka and clickhouse to handle event
     response = requests.get(url, headers={'Auth': user_token})
     assert response.status_code == 200
     assert response.json().get("likes") == 1

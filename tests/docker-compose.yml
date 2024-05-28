@@ -66,15 +66,17 @@ services:
       DB_NAME: DB_MAIN
       DATABASE_URL: postgresql+asyncpg://MASTER:MASTER@db_main:31338/DB_MAIN
       KAFKA_URL: statistics_broker:31341
-      CLICKHOUSE_URL: db_statistics:9000
       AUTH_KEY: a-secret-i-will-never-ever-tell
       GRPC_SERVER_CONTENT: content_service:31339
+      GRPC_SERVER_STATISTICS: statistics_service:31343
     ports:
       - "31337:31337"
     depends_on:
       db_main:
         condition: service_started
       content_service:
+        condition: service_started
+      statistics_service:
         condition: service_started
       db_statistics:
         condition: service_started
@@ -99,6 +101,15 @@ services:
       - db_content
     logging:
       driver: none
+
+  statistics_service:
+    build: ../src/statistics_service
+    environment:
+      APP_PORT: 31343
+      APP_HOST: "0.0.0.0"
+      CLICKHOUSE_URL: "db_statistics:9000"
+    depends_on:
+      - db_statistics
 
   test1:
     build: ./tests_auth
