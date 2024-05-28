@@ -24,10 +24,48 @@ class StatisticsService(protocols_pb2_grpc.StatisticsServiceServicer):
         return protocols_pb2.PostStatisticsResponse(post_id=post_id, likes=likes, views=views)
 
     async def GetTopPosts(self, request, context):
-        pass
+        top_posts = None
+        if request.sorted_by_likes:
+            top_posts = client.execute(
+                'SELECT post_id, COUNT(*) AS likes \
+                FROM statistics.likes \
+                GROUP BY post_id \
+                ORDER BY likes DESC \
+                LIMIT 5'
+            )
+        else:
+            top_posts = client.execute(
+                'SELECT post_id, COUNT(*) AS views \
+                FROM statistics.views \
+                GROUP BY post_id \
+                ORDER BY views DESC \
+                LIMIT 5'
+            )
+        output = protocols_pb2.TopPostsResponse()
+        for top_post in top_posts:
+            entry = protocols_pb2.TopPostInfo(
+                post_id=top_post[0],
+                count=top_post[1]
+            )
+            output.posts.append(entry)
+        return output
 
     async def GetTopUsers(self, request, context):
-        pass
+        top_users = client.execute(
+            'SELECT user_id, COUNT(*) AS likes \
+            FROM statistics.users_liked \
+            GROUP BY user_id \
+            ORDER BY likes DESC \
+            LIMIT 3'
+        )
+        output = protocols_pb2.TopUsersResponse()
+        for top_user in top_users:
+            entry = protocols_pb2.UserStatistics(
+                id=top_user[0],
+                likes=top_user[1],
+            )
+            output.users.append(entry)
+        return output
 
 
 async def serve():

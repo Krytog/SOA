@@ -16,26 +16,23 @@ message PostStatisticsResponse {
     uint64 post_id = 3;
 }
 
-message PostWithAuthorStatistics {
-    uint64 post_id = 1;
-    uint64 author_id = 2;
-    uint64 likes = 3;
-    uint64 views = 4;
-}
-
 message TopPostsRequest {
     bool sorted_by_likes = 1;
 }
 
+message TopPostInfo {
+    uint64 post_id = 1;
+    uint64 count = 2;
+}
+
 message TopPostsResponse {
-    repeated PostWithAuthorStatistics posts = 1;
+    repeated TopPostInfo posts = 1;
 }
 
 message UserStatistics {
     uint64 id = 1;
     uint64 likes = 2;
 }
-
 
 message TopUsersResponse {
     repeated UserStatistics users = 1;

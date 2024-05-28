@@ -22,29 +22,25 @@ class PostStatisticsResponse(_message.Message):
     post_id: int
     def __init__(self, likes: _Optional[int] = ..., views: _Optional[int] = ..., post_id: _Optional[int] = ...) -> None: ...
 
-class PostWithAuthorStatistics(_message.Message):
-    __slots__ = ["post_id", "author_id", "likes", "views"]
-    POST_ID_FIELD_NUMBER: _ClassVar[int]
-    AUTHOR_ID_FIELD_NUMBER: _ClassVar[int]
-    LIKES_FIELD_NUMBER: _ClassVar[int]
-    VIEWS_FIELD_NUMBER: _ClassVar[int]
-    post_id: int
-    author_id: int
-    likes: int
-    views: int
-    def __init__(self, post_id: _Optional[int] = ..., author_id: _Optional[int] = ..., likes: _Optional[int] = ..., views: _Optional[int] = ...) -> None: ...
-
 class TopPostsRequest(_message.Message):
     __slots__ = ["sorted_by_likes"]
     SORTED_BY_LIKES_FIELD_NUMBER: _ClassVar[int]
     sorted_by_likes: bool
     def __init__(self, sorted_by_likes: bool = ...) -> None: ...
 
+class TopPostInfo(_message.Message):
+    __slots__ = ["post_id", "count"]
+    POST_ID_FIELD_NUMBER: _ClassVar[int]
+    COUNT_FIELD_NUMBER: _ClassVar[int]
+    post_id: int
+    count: int
+    def __init__(self, post_id: _Optional[int] = ..., count: _Optional[int] = ...) -> None: ...
+
 class TopPostsResponse(_message.Message):
     __slots__ = ["posts"]
     POSTS_FIELD_NUMBER: _ClassVar[int]
-    posts: _containers.RepeatedCompositeFieldContainer[PostWithAuthorStatistics]
-    def __init__(self, posts: _Optional[_Iterable[_Union[PostWithAuthorStatistics, _Mapping]]] = ...) -> None: ...
+    posts: _containers.RepeatedCompositeFieldContainer[TopPostInfo]
+    def __init__(self, posts: _Optional[_Iterable[_Union[TopPostInfo, _Mapping]]] = ...) -> None: ...
 
 class UserStatistics(_message.Message):
     __slots__ = ["id", "likes"]
