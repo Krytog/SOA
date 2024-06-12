@@ -1,4 +1,4 @@
-# Примеры комманд для теста API:
+# Примеры комманд для теста API основного сервиса:
 
 
 ```
@@ -25,24 +25,44 @@ docker volume rm soa_db_main
 ```
 
 
-# Примеры комманд для теста новго API:
+# Примеры комманд для теста API контентного сервиса:
 ```
-#curl -H "Content-Type: application/json" -H "Auth: <token>" -d '{"content": "A new post!"}' -X POST http://localhost:31337/api/content/create_post
-```
-
-
-```
-#curl -H "Content-Type: application/json" -H "Auth: <token>" -d '{"content": "Hey guys! I have just decided to update this old post!"}' -X PUT http://localhost:31337/api/content/update_post/{<post_id>}
+curl -H "Content-Type: application/json" -H "Auth: <token>" -d '{"content": "A new post!"}' -X POST http://localhost:31337/api/content/create_post
 ```
 
+
 ```
-#curl -H "Content-Type: application/json" -H "Auth: <token>" http://localhost:31337/api/content/get_post/{<post_id>}
+curl -H "Content-Type: application/json" -H "Auth: <token>" -d '{"content": "Hey guys! I have just decided to update this old post!"}' -X PUT http://localhost:31337/api/content/update_post/{<post_id>}
 ```
 
 ```
-#curl -H "Content-Type: application/json" -H "Auth: <token>" -X PUT http://localhost:31337/api/content/delete_post/{<post_id>}
+curl -H "Content-Type: application/json" -H "Auth: <token>" http://localhost:31337/api/content/get_post/{<post_id>}
+```
+
+```
+curl -H "Content-Type: application/json" -H "Auth: <token>" -X PUT http://localhost:31337/api/content/delete_post/{<post_id>}
 ```
 
 ```
 curl -H "Content-Type: application/json" -H "Auth: <token>" -d '{"user_id": "1", "page": "1", "per_page": "2"}' -X GET http://localhost:31337/api/content/get_postslist
 ```
+
+# Примеры комманд для теста API сервиса статистики:
+```
+curl -H "Content-Type: application/json" -H "Auth: <token>" -d '{"post_id": <id>}' -X PUT http://localhost:31337/api/statistics/view
+```
+
+
+```
+curl -H "Content-Type: application/json" -H "Auth: <token>" -d '{"post_id": <id>}' -X PUT http://localhost:31337/api/statistics/like
+```
+
+```
+curl -H "Content-Type: application/json" -H "Auth: <token>" http://localhost:31337/api/statistics/views/<post_id>
+```
+
+```
+curl -H "Content-Type: application/json" -H "Auth: <token>" http://localhost:31337/api/statistics/likes/<post_id>
+```
+
+Нужно учитывать, что после поступления события лайка/просмотра в систему, некоторое время (несколько секунд) пройдёт перед тем, как оно будет доступно в БД.
