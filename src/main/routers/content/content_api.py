@@ -9,8 +9,8 @@ from routers.content.request_body_types import PostContent, PostsList
 
 from os import environ
 import grpc
-from proto.protocols_pb2_grpc import *
-from proto.protocols_pb2 import *
+from proto.content.protocols_content_pb2_grpc import *
+from proto.content.protocols_content_pb2 import *
 from database.db_session import DBSession
 from utilities.db_tools import get_user_id_from_token
 import datetime
@@ -32,7 +32,7 @@ async def create_post(db: DBSession, content: PostContent, auth: Annotated[str, 
         author_id=user_id,
         content=content.content
     ))
-    return JSONResponse(content={"message": "created post id is " + str(result.post_id)}, status_code=status.HTTP_200_OK)
+    return JSONResponse(content={"id": str(result.post_id)}, status_code=status.HTTP_200_OK)
 
 
 @router.put("/api/content/update_post/{post_id}")

@@ -19,6 +19,15 @@ async def get_user_by_login(db: DBSession, login: str):
     return result_as_dict[0] # there can be only one user with given login
 
 
+async def get_user_by_id(db: DBSession, id: int):
+    query = users_table.select().where(users_table.c.id == id)
+    result = await db.execute(query)
+    result_as_dict = result.mappings().all()
+    if len(result_as_dict) == 0:
+        return None
+    return result_as_dict[0] # there can be only one user with given id
+
+
 async def create_user(db: DBSession, login: str, password: str):
     salt = get_salt(15)
     hashed_password = get_hash_of_password(password, salt) + " " + salt
