@@ -2,7 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import proto.protocols_pb2 as protocols__pb2
+import proto.content.protocols_content_pb2 as protocols__content__pb2
 
 
 class ContentServiceStub(object):
@@ -16,28 +16,28 @@ class ContentServiceStub(object):
         """
         self.CreatePost = channel.unary_unary(
                 '/contents_service_grpc.ContentService/CreatePost',
-                request_serializer=protocols__pb2.CreatePostRequest.SerializeToString,
-                response_deserializer=protocols__pb2.PostId.FromString,
+                request_serializer=protocols__content__pb2.CreatePostRequest.SerializeToString,
+                response_deserializer=protocols__content__pb2.PostId.FromString,
                 )
         self.UpdatePost = channel.unary_unary(
                 '/contents_service_grpc.ContentService/UpdatePost',
-                request_serializer=protocols__pb2.UpdatePostRequest.SerializeToString,
-                response_deserializer=protocols__pb2.StatusResponse.FromString,
+                request_serializer=protocols__content__pb2.UpdatePostRequest.SerializeToString,
+                response_deserializer=protocols__content__pb2.StatusResponse.FromString,
                 )
         self.DeletePost = channel.unary_unary(
                 '/contents_service_grpc.ContentService/DeletePost',
-                request_serializer=protocols__pb2.DeletePostRequest.SerializeToString,
-                response_deserializer=protocols__pb2.StatusResponse.FromString,
+                request_serializer=protocols__content__pb2.DeletePostRequest.SerializeToString,
+                response_deserializer=protocols__content__pb2.StatusResponse.FromString,
                 )
         self.GetPost = channel.unary_unary(
                 '/contents_service_grpc.ContentService/GetPost',
-                request_serializer=protocols__pb2.PostId.SerializeToString,
-                response_deserializer=protocols__pb2.PostResponse.FromString,
+                request_serializer=protocols__content__pb2.PostId.SerializeToString,
+                response_deserializer=protocols__content__pb2.PostResponse.FromString,
                 )
         self.GetPostsList = channel.unary_unary(
                 '/contents_service_grpc.ContentService/GetPostsList',
-                request_serializer=protocols__pb2.PostsListRequest.SerializeToString,
-                response_deserializer=protocols__pb2.PostsListResponse.FromString,
+                request_serializer=protocols__content__pb2.PostsListRequest.SerializeToString,
+                response_deserializer=protocols__content__pb2.PostsListResponse.FromString,
                 )
 
 
@@ -79,28 +79,28 @@ def add_ContentServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'CreatePost': grpc.unary_unary_rpc_method_handler(
                     servicer.CreatePost,
-                    request_deserializer=protocols__pb2.CreatePostRequest.FromString,
-                    response_serializer=protocols__pb2.PostId.SerializeToString,
+                    request_deserializer=protocols__content__pb2.CreatePostRequest.FromString,
+                    response_serializer=protocols__content__pb2.PostId.SerializeToString,
             ),
             'UpdatePost': grpc.unary_unary_rpc_method_handler(
                     servicer.UpdatePost,
-                    request_deserializer=protocols__pb2.UpdatePostRequest.FromString,
-                    response_serializer=protocols__pb2.StatusResponse.SerializeToString,
+                    request_deserializer=protocols__content__pb2.UpdatePostRequest.FromString,
+                    response_serializer=protocols__content__pb2.StatusResponse.SerializeToString,
             ),
             'DeletePost': grpc.unary_unary_rpc_method_handler(
                     servicer.DeletePost,
-                    request_deserializer=protocols__pb2.DeletePostRequest.FromString,
-                    response_serializer=protocols__pb2.StatusResponse.SerializeToString,
+                    request_deserializer=protocols__content__pb2.DeletePostRequest.FromString,
+                    response_serializer=protocols__content__pb2.StatusResponse.SerializeToString,
             ),
             'GetPost': grpc.unary_unary_rpc_method_handler(
                     servicer.GetPost,
-                    request_deserializer=protocols__pb2.PostId.FromString,
-                    response_serializer=protocols__pb2.PostResponse.SerializeToString,
+                    request_deserializer=protocols__content__pb2.PostId.FromString,
+                    response_serializer=protocols__content__pb2.PostResponse.SerializeToString,
             ),
             'GetPostsList': grpc.unary_unary_rpc_method_handler(
                     servicer.GetPostsList,
-                    request_deserializer=protocols__pb2.PostsListRequest.FromString,
-                    response_serializer=protocols__pb2.PostsListResponse.SerializeToString,
+                    request_deserializer=protocols__content__pb2.PostsListRequest.FromString,
+                    response_serializer=protocols__content__pb2.PostsListResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -124,8 +124,8 @@ class ContentService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/contents_service_grpc.ContentService/CreatePost',
-            protocols__pb2.CreatePostRequest.SerializeToString,
-            protocols__pb2.PostId.FromString,
+            protocols__content__pb2.CreatePostRequest.SerializeToString,
+            protocols__content__pb2.PostId.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -141,8 +141,8 @@ class ContentService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/contents_service_grpc.ContentService/UpdatePost',
-            protocols__pb2.UpdatePostRequest.SerializeToString,
-            protocols__pb2.StatusResponse.FromString,
+            protocols__content__pb2.UpdatePostRequest.SerializeToString,
+            protocols__content__pb2.StatusResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -158,8 +158,8 @@ class ContentService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/contents_service_grpc.ContentService/DeletePost',
-            protocols__pb2.DeletePostRequest.SerializeToString,
-            protocols__pb2.StatusResponse.FromString,
+            protocols__content__pb2.DeletePostRequest.SerializeToString,
+            protocols__content__pb2.StatusResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -175,8 +175,8 @@ class ContentService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/contents_service_grpc.ContentService/GetPost',
-            protocols__pb2.PostId.SerializeToString,
-            protocols__pb2.PostResponse.FromString,
+            protocols__content__pb2.PostId.SerializeToString,
+            protocols__content__pb2.PostResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -192,7 +192,7 @@ class ContentService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/contents_service_grpc.ContentService/GetPostsList',
-            protocols__pb2.PostsListRequest.SerializeToString,
-            protocols__pb2.PostsListResponse.FromString,
+            protocols__content__pb2.PostsListRequest.SerializeToString,
+            protocols__content__pb2.PostsListResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
